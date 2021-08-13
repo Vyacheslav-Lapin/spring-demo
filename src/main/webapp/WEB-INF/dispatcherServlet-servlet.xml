@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+       xmlns:jdbc="http://www.springframework.org/schema/jdbc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:c="http://www.springframework.org/schema/c"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.3.xsd
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+  <context:component-scan base-package="ru.vlapin.trainings.todo"/>
+
+  <mvc:annotation-driven>
+    <mvc:message-converters>
+      <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"
+            p:objectMapper-ref="jsonMapper"/>
+      <bean class="org.springframework.http.converter.xml.MappingJackson2XmlHttpMessageConverter"
+            p:objectMapper-ref="xmlMapper"/>
+    </mvc:message-converters>
+  </mvc:annotation-driven>
+
+  <bean id="jsonMapper" class="org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean"
+        p:simpleDateFormat="yyyy-MM-dd HH:mm:ss"/>
+
+  <bean id="xmlMapper" parent="jsonMapper" p:createXmlMapper="true"/>
+
+  <mvc:resources mapping="/webjars/**"
+                 location="classpath:META-INF/resources/webjars/"/>
+
+  <jpa:repositories base-package="ru.vlapin.trainings.todo.repository"/>
+
+  <jdbc:embedded-database id="dataSource" type="H2">
+    <jdbc:script location="classpath:META-INF/sql/schema.sql"/>
+    <jdbc:script location="classpath:META-INF/sql/data.sql"/>
+  </jdbc:embedded-database>
+
+  <bean id="jpaVendorAdapter"
+        class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"
+        p:showSql="true"/>
+
+  <bean id="entityManagerFactory"
+        class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
+        p:dataSource-ref="dataSource"
+        p:jpaVendorAdapter-ref="jpaVendorAdapter"/>
+
+  <bean id="transactionManager"
+        class="org.springframework.orm.jpa.JpaTransactionManager"
+        p:entityManagerFactory-ref="entityManagerFactory"/>
+
+  <tx:annotation-driven/>
+
+  <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"
+        p:prefix="/WEB-INF/view/"
+        p:suffix=".jsp"/>
+
+  <bean id="h2WebServer" class="org.h2.tools.Server"
+        factory-method="createWebServer"
+        init-method="start"
+        destroy-method="stop">
+    <constructor-arg value="-web,-webAllowOthers,-webDaemon,-webPort,8082"/>
+  </bean>
+
+</beans>

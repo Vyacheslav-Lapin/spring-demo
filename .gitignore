@@ -1,0 +1,10 @@
+/**/logs/
+/tomcat
+
+/**/target/
+/**/pom.xml.versionsBackup
+
+#/**/.idea/
+#/**/*.iml
+/**/out/
+/**/classes/

@@ -19,7 +19,7 @@
   </div>
   <div class="page-header">
     <h1>API</h1>
-    <a href="/todo">Current ToDos</a>
+    <a href="${pageContext.request.contextPath}/toDos">Current ToDos</a>
   </div>
 </div>
 

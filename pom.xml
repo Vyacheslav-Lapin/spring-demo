@@ -1,54 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="           http://maven.apache.org/POM/4.0.0           http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>ru.vlapin.trainings</groupId>
   <artifactId>spring-demo</artifactId>
   <version>1.0-SNAPSHOT</version>
-
   <packaging>war</packaging>
 
   <properties>
     <java.version>16</java.version>
     <minimal.maven.version>3.8.1</minimal.maven.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!--region libs-->
     <jsp.version>2.2.1-b03</jsp.version>
-    <bootstrap.version>5.0.0-beta3</bootstrap.version>
-    <webjars.version>0.40</webjars.version>
-    <spring-boot.version>2.4.5</spring-boot.version>
+    <bootstrap.version>5.1.0</bootstrap.version>
+    <webjars.version>0.41</webjars.version>
+    <spring-boot.version>2.5.3</spring-boot.version>
     <hibernate-jpa.version>1.0.2</hibernate-jpa.version>
-
-    <checker.version>3.12.0</checker.version>
-    <annotations.version>20.1.0</annotations.version>
+    <lombok.version>1.18.20</lombok.version>
+    <checker.version>3.17.0</checker.version>
+    <annotations.version>22.0.0</annotations.version>
     <jcip-annotations.version>1.0</jcip-annotations.version>
-    <spotbugs.version>4.2.3</spotbugs.version>
-    <error_prone_annotations.version>2.6.0</error_prone_annotations.version>
+    <spotbugs.version>4.3.0</spotbugs.version>
+    <error_prone_annotations.version>2.8.1</error_prone_annotations.version>
     <!--endregion-->
 
     <!--region plugins-->
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     <maven.compiler.release>${java.version}</maven.compiler.release>
     <maven.compiler.parameters>true</maven.compiler.parameters>
-    <maven.compiler.forceJavacCompilerUse>true</maven.compiler.forceJavacCompilerUse>
-    <maven.compiler.showWarnings>true</maven.compiler.showWarnings>
-    <maven.compiler.showDeprecation>true</maven.compiler.showDeprecation>
-    <maven.compiler.fork>true</maven.compiler.fork>
-    <maven.compiler.executable>true</maven.compiler.executable>
-
-    <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
+    <maven-surefire-plugin.version>3.0.0-M4</maven-surefire-plugin.version>
     <maven-war-plugin.version>3.3.1</maven-war-plugin.version>
+    <maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
+    <lombok-maven-plugin.version>1.18.20.0</lombok-maven-plugin.version>
+    <versions-maven-plugin.version>2.7</versions-maven-plugin.version>
     <!--endregion-->
 
+    <properties-maven-plugin.version>1.0.0</properties-maven-plugin.version>
   </properties>
 
   <dependencyManagement>
     <dependencies>
-
       <dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-dependencies</artifactId>
@@ -56,7 +47,6 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>
         <artifactId>hibernate-jpa-2.1-api</artifactId>
@@ -116,13 +106,12 @@
   </dependencyManagement>
 
   <dependencies>
-
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-webmvc</artifactId>
     </dependency>
 
-    <!-- Spring Data JPA -->
+    <!--region Spring Data JPA -->
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-jpa</artifactId>
@@ -139,13 +128,13 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <scope>provided</scope>
       <optional>true</optional>
     </dependency>
+    <!--endregion -->
 
     <!-- Журналы -->
     <dependency>
@@ -194,7 +183,7 @@
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-joda</artifactId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -228,7 +217,7 @@
 
   <build>
     <finalName>todo</finalName>
-    <defaultGoal>verify</defaultGoal>
+    <defaultGoal>clean verify</defaultGoal>
 
     <pluginManagement>
       <plugins>
@@ -237,7 +226,9 @@
           <version>${maven-compiler-plugin.version}</version>
           <configuration>
             <compilerArgs>
+              <!--<arg>-parameters</arg>-->
               <arg>--enable-preview</arg>
+              <!--<arg>-Xplugin:Manifold</arg>-->
               <!--<arg>-Xlint:preview</arg>-->
               <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
               <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
@@ -251,6 +242,17 @@
               <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.jvm=ALL-UNNAMED</arg>
             </compilerArgs>
           </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${maven-surefire-plugin.version}</version>
+          <configuration>
+            <argLine>--enable-preview</argLine>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${maven-war-plugin.version}</version>
         </plugin>
         <plugin>
           <artifactId>maven-enforcer-plugin</artifactId>
@@ -272,8 +274,45 @@
           </executions>
         </plugin>
         <plugin>
-          <artifactId>maven-war-plugin</artifactId>
-          <version>${maven-war-plugin.version}</version>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok-maven-plugin</artifactId>
+          <version>${lombok-maven-plugin.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>versions-maven-plugin</artifactId>
+          <version>${versions-maven-plugin.version}</version>
+          <configuration>
+            <generateBackupPoms>false</generateBackupPoms>
+            <!--suppress MavenModelInspection, UnresolvedMavenProperty -->
+            <rulesUri>file://${maven.multiModuleProjectDirectory}/ruleset.xml</rulesUri>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>properties-maven-plugin</artifactId>
+          <version>${properties-maven-plugin.version}</version>
+          <executions>
+            <execution>
+              <phase>initialize</phase>
+              <goals>
+                <goal>read-project-properties</goal>
+              </goals>
+              <configuration>
+                <files>
+                  <!--suppress MavenModelInspection, UnresolvedMavenProperty-->
+                  <file>${maven.multiModuleProjectDirectory}/maven.properties</file>
+                </files>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -282,8 +321,19 @@
       <plugin>
         <artifactId>maven-enforcer-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>versions-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>properties-maven-plugin</artifactId>
+      </plugin>
     </plugins>
-
   </build>
 
 </project>
